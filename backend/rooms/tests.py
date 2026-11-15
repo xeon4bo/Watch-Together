@@ -21,6 +21,16 @@ class RoomApiTests(TestCase):
         Membership.objects.create(room=self.room, user=self.owner)
         self.client = APIClient()
 
+    def test_service_root_is_public_and_reports_api_status(self):
+        response = self.client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            "service": "Watch Together API",
+            "status": "ok",
+            "health": "/health/",
+        })
+
     def test_guest_can_join_private_invite_and_read_room(self):
         self.client.force_authenticate(self.guest)
         joined = self.client.post(f"/api/rooms/{self.room.id}/")

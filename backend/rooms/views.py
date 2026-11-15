@@ -71,6 +71,15 @@ def upload_avatar_to_filebox(uploaded):
 def health(request):
     return JsonResponse({"status": "ok"})
 
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def api_root(request):
+    return JsonResponse({
+        "service": "Watch Together API",
+        "status": "ok",
+        "health": "/health/",
+    })
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):

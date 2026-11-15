@@ -56,6 +56,7 @@ You can paste a stream URL while creating a room or add/change it in the room pl
 
 ## API outline
 
+- `GET /` returns the public API service status; `GET /health/` is the deployment health check.
 - `POST /api/auth/register/`, `POST /api/auth/login/`, `POST /api/auth/logout/`, `GET /api/auth/me/`, `PATCH/DELETE /api/auth/me/avatar/`
 - `GET/POST /api/rooms/`; `GET/POST/PATCH/DELETE /api/rooms/<uuid>/`; `POST /api/rooms/<uuid>/leave/`
 - `ws://127.0.0.1:8000/ws/rooms/<uuid>/?token=<auth-token>`
