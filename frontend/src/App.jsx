@@ -9,9 +9,23 @@ import {
 } from 'lucide-react';
 
 const API = import.meta.env.VITE_API_URL || window.location.origin;
-const WS = import.meta.env.VITE_WS_URL || (import.meta.env.PROD
+const DEFAULT_WS = import.meta.env.PROD
   ? 'wss://watch-together-0ygf.onrender.com'
-  : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`);
+  : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}`;
+const configuredWs = import.meta.env.VITE_WS_URL;
+let WS = DEFAULT_WS;
+if (configuredWs) {
+  try {
+    const parsedWs = new URL(configuredWs);
+    if (parsedWs.protocol === 'ws:' || parsedWs.protocol === 'wss:') {
+      WS = parsedWs.origin;
+    } else {
+      console.warn('Ignoring VITE_WS_URL: use a ws:// or wss:// URL.');
+    }
+  } catch {
+    console.warn('Ignoring invalid VITE_WS_URL: use a ws:// or wss:// URL.');
+  }
+}
 const isNgrokPreview = /\.ngrok-free\.(app|dev)$/.test(window.location.hostname);
 const getToken = () => localStorage.getItem('wwf_token');
 const getUser = () => JSON.parse(localStorage.getItem('wwf_user') || 'null');
