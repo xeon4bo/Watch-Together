@@ -348,7 +348,7 @@ function Player({ room, send, setSyncing }) {
   const fmt = time => `${Math.floor((time || 0) / 60).toString().padStart(2, '0')}:${Math.floor((time || 0) % 60).toString().padStart(2, '0')}`;
   return <div className="player-wrap">
     <div className="video-stage" onTouchEnd={onStageTouchEnd}>
-      <video ref={videoRef} playsInline onTimeUpdate={e => setPosition(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration || 0)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={explainVideoError} />
+      <video ref={videoRef} playsInline style={{ display: room.video_url ? 'block' : 'none' }} onTimeUpdate={e => setPosition(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration || 0)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={explainVideoError} />
       {seekFeedback && <div className={`seek-feedback ${seekFeedback}`} aria-live="polite">{seekFeedback === 'left' ? '−10 sec' : '+10 sec'}</div>}
       {!room.video_url && <div className="player-empty"><div className="player-empty-icon"><Play size={22} fill="currentColor" /></div><span className="eyebrow">YOUR ROOM, YOUR MOVIE</span><h2>What are we watching?</h2><p>Share a direct MP4 or compatible HLS link to get everyone in sync.</p><form className="stream-form" onSubmit={onUrl}><Link2 size={17} /><input name="stream" placeholder="Paste a video stream URL" aria-label="Video stream URL" /><button className="button primary">Add video <ArrowRight size={15} /></button></form></div>}
       {room.video_url && error && <div className="video-error"><div><MonitorPlay size={22} /><p>{error}</p></div><button className="button secondary" onClick={() => send({ type: 'video_changed', video_url: '' })}>Change video</button></div>}
@@ -413,6 +413,9 @@ function RoomPage() {
         if (!active) return;
         const ws = new WebSocket(url);
         socketRef.current = ws;
+        ws.onopen = () => {
+          setError(current => (current && (current.includes('Reconnecting') || current.includes('Connection') || current.includes('connection'))) ? '' : current);
+        };
         ws.onmessage = event => {
           const message = JSON.parse(event.data);
           if (message.type === 'playback_state') syncState(message);
